@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -130,6 +131,8 @@ public class CameraMovement2 : MonoBehaviour {
 
     void Position()
     {
+        forward = Math.Abs(Input.GetAxis("Vertical"));
+        /*
         // how far off are the sticks from each other
         float dif = left - right;
         // move forward if sticks are within a threshold of each other
@@ -172,6 +175,7 @@ public class CameraMovement2 : MonoBehaviour {
             floorStatus = "left";
            //// floor.SetFloor(new Vector4(10.0f, 0.0f, 10.0f, 0.0f));
         }
+         */
     }
 
     public void StopMovement()
