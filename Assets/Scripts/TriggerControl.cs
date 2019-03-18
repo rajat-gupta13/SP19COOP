@@ -39,7 +39,7 @@ public class TriggerControl : MonoBehaviour {
 			StartCoroutine(NormalLights(Color.blue, 0.01f));
 			// play audio file title screen music
 			StartCoroutine(PlayFile(0, 0.01f));
-			StartCoroutine(WaitingToTrigger("Trigger #2 - experience begins", clips[1].length + 0.01f));
+			//StartCoroutine(WaitingToTrigger("Trigger #2 - experience begins", clips[1].length + 0.01f));
 			break;
 
 		case "Trigger #2 - experience begins":

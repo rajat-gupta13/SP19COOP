@@ -5,6 +5,8 @@ using UnityEngine;
 public class CollisionControl : MonoBehaviour {
 
     public GameObject notify;
+    [HideInInspector]
+    public bool introStart = false;
 
 	// Use this for initialization
 	void Start () {
@@ -20,6 +22,10 @@ public class CollisionControl : MonoBehaviour {
 		print("Trigger hit: " + other.gameObject.name);
         switch (other.gameObject.name)
         {
+            case "intro trigger":
+                introStart = true;
+                notify.SendMessage("TriggerEvent", "Trigger #2 - experience begins");
+                break;
             case "after tutorial trigger":
                 notify.SendMessage("TriggerEvent", "Trigger #3 - reach a certain point");
                 break;

@@ -53,6 +53,9 @@ public class CameraMovement2 : MonoBehaviour {
     private bool portCannons = false;
     private bool starboardCannons = false;
     private bool cannonEnableFirst = false;
+    public GameObject startTarget;
+
+    private bool startExperience = false;
 
     // Use this for initialization
     void Start () {
@@ -77,9 +80,11 @@ public class CameraMovement2 : MonoBehaviour {
         // this is called when the start button on the puppet screen is clicked by the tour guide
         if (!started) {
             started = true;
-            ///triggerControl.TriggerEvent("Trigger #1 - title screen");
+            triggerControl.TriggerEvent("Trigger #1 - title screen");
             print("i'm starting");
+            startExperience = true;
         }
+        
     }
 
     public void SkipButton()
@@ -186,6 +191,8 @@ public class CameraMovement2 : MonoBehaviour {
             ///}
         }*/
         
+        if (startExperience && !node.GetComponent<CollisionControl>().introStart)
+            node.transform.position = Vector3.MoveTowards(node.transform.position, startTarget.transform.position, 6.0f * Time.deltaTime);
         // update the position of the node
         node.transform.Translate(Vector3.forward * forward * Time.deltaTime*6.0f);
         ///node.transform.Translate(Vector3.up * up * Time.deltaTime * 15.0f);     // rcc - add in rise and fall
