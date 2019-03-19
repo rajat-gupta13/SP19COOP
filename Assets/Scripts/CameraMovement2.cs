@@ -55,7 +55,14 @@ public class CameraMovement2 : MonoBehaviour {
     private bool cannonEnableFirst = false;
     public GameObject startTarget;
 
+    public GameObject cannonPrefab;
+    public Transform cannonSpawn;
+    public float cannonSpeed = 30f;
+    public float cannonLifetime = 3f;
     private bool startExperience = false;
+
+    private bool cannonFired = false;
+    public float fireDelay = 1f;
 
     // Use this for initialization
     void Start () {
@@ -166,11 +173,19 @@ public class CameraMovement2 : MonoBehaviour {
             {
                 pitch = Input.GetAxis("P2-VerticalLeft");
                 roll = Input.GetAxis("P2-HorizontalRight");
+                if ((Mathf.Abs(Input.GetAxis("P1-LTrigger")) == 1 || Mathf.Abs(Input.GetAxis("P1-RTrigger")) == 1) && !cannonFired)
+                {
+                    Shoot();
+                }
             }
             else if (portCannons)
             {
                 pitch = Input.GetAxis("P1-VerticalLeft");
                 roll = Input.GetAxis("P1-HorizontalRight");
+                if ((Mathf.Abs(Input.GetAxis("P2-LTrigger")) == 1 || Mathf.Abs(Input.GetAxis("P2-RTrigger")) == 1) && !cannonFired)
+                {
+                    Shoot();
+                }
             }
         }
 
@@ -201,6 +216,35 @@ public class CameraMovement2 : MonoBehaviour {
         // rcc - cap the sub vertical height
         ///if (node.transform.position.y > subHighCutoff) { node.transform.position = new Vector3(node.transform.position.x, subHighCutoff, node.transform.position.z); }
 
+    }
+
+    void Shoot() {
+        cannonFired = true;
+        Debug.Log("Shooting");
+        GameObject cannon = Instantiate(cannonPrefab);
+
+        Physics.IgnoreCollision(cannon.GetComponent<Collider>(), cannonSpawn.parent.GetComponent<Collider>());
+
+        cannon.transform.position = cannonSpawn.position;
+        Vector3 rotation = cannon.transform.rotation.eulerAngles;
+
+        cannon.transform.rotation = Quaternion.Euler(rotation.x, transform.eulerAngles.y, rotation.z);
+
+        cannon.GetComponent<Rigidbody>().AddForce(cannonSpawn.forward * cannonSpeed, ForceMode.Impulse);
+        StartCoroutine(ResetCannon(fireDelay));
+        StartCoroutine(DestroyCannonAfterTime(cannon, cannonLifetime));
+    }
+
+    private IEnumerator DestroyCannonAfterTime(GameObject cannon, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Destroy(cannon);
+    }
+
+    private IEnumerator ResetCannon(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        cannonFired = false;
     }
 
     void Position()
