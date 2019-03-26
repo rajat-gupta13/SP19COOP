@@ -32,30 +32,49 @@ public class TriggerControl : MonoBehaviour {
 		print("in TriggerEvent with : " + eventName);
 		switch (eventName)
 		{
-		case "Trigger #1 - title screen":
-			// hide the title screen
-			titleScreen.SetActive(false);
-			// setup lighting
-			StartCoroutine(NormalLights(Color.blue, 0.01f));
-			// play audio file title screen music
-			StartCoroutine(PlayFile(0, 0.01f));
-			//StartCoroutine(WaitingToTrigger("Trigger #2 - experience begins", clips[1].length + 0.01f));
-			break;
+		    case "Trigger #1 - experience start":
+			    // hide the title screen
+			    titleScreen.SetActive(false);
+		    	// setup lighting
+			    StartCoroutine(NormalLights(Color.blue, 0.01f));
+			    // play audio file title screen music
+			    StartCoroutine(PlayFile(0, 0.01f));
+			    //StartCoroutine(WaitingToTrigger("Trigger #2 - experience begins", clips[1].length + 0.01f));
+			    break;
 
-		case "Trigger #2 - experience begins":
-			// play audio file #1
-			StartCoroutine(PlayFile(1, 0.01f));
-			// Right Guest is allowed to move throttle (joystick)
-			move.p1Enabled = true;
-			break;
+		    case "Trigger #2 - enable player1 tutorial":
+			    // play audio file #1
+			    StartCoroutine(PlayFile(1, 0.01f));
+			    // Right Guest is allowed to move throttle (joystick)
+			    move.p1Enabled = true;
+			    break;
 
-		case "Trigger #12 - credits":
-			// show credit screen
-			creditScreen.SetActive(true);
-			// stop guests from moving
-			move.p1Enabled = false;
-			move.p2Enabled = false;
-			break;
+            case "Trigger #2-2 - enable player2 tutorial":
+                // play audio file #1
+                StartCoroutine(PlayFile(2, 0.01f));
+                // Left Guest is allowed to move throttle (joystick)
+                move.p2Enabled = true;
+                break;
+
+            case "Trigger #2-3 - tutorial ends":
+                // play audio file #1
+                StartCoroutine(PlayFile(3, 0.01f));               
+                break;
+
+            case "Trigger #3 - whale interaction":
+                // play audio file #1
+                StartCoroutine(PlayFile(4, 0.01f));
+                // Right Guest is allowed to move throttle (joystick)
+                move.whaleEnabled = true;
+                break;
+
+            case "Trigger #12 - credits":
+			    // show credit screen
+			    creditScreen.SetActive(true);
+			    // stop guests from moving
+			    move.p1Enabled = false;
+			    move.p2Enabled = false;
+			    break;
 
 		}
 	}

@@ -19,6 +19,7 @@ public class CameraMovement2 : MonoBehaviour {
     public Button starboardButton;
     public Text cannonActivatedText;
     public Text cannonAssignedText;
+    public GameObject whale;
 
     [HideInInspector]
     public bool p1Enabled = false;
@@ -28,8 +29,14 @@ public class CameraMovement2 : MonoBehaviour {
     public bool canRise = false;
     [HideInInspector]
     public bool canFall = false;
+    [HideInInspector]
+    public bool whaleEnabled = false;
+    [HideInInspector]
+    public int targetCount = 0;
 
+    public GameObject[] whaleTargets;
 
+    private bool whaleFirst = false;
     private bool rightfirst = false;
     private bool leftfirst = false;
     private bool risefirst = false;
@@ -64,6 +71,8 @@ public class CameraMovement2 : MonoBehaviour {
     private bool cannonFired = false;
     public float fireDelay = 1f;
 
+    private GameObject currentWhaleTarget;
+
     // Use this for initialization
     void Start () {
         portButton.interactable = false;
@@ -87,7 +96,7 @@ public class CameraMovement2 : MonoBehaviour {
         // this is called when the start button on the puppet screen is clicked by the tour guide
         if (!started) {
             started = true;
-            triggerControl.TriggerEvent("Trigger #1 - title screen");
+            triggerControl.TriggerEvent("Trigger #1 - experience start");
             print("i'm starting");
             startExperience = true;
         }
@@ -134,26 +143,24 @@ public class CameraMovement2 : MonoBehaviour {
         if (!started) {
             starboardText.text = "Starboard Controller - ";
             portText.text = "Port Controller - ";
-            //starboardText.text += "LH: " + Input.GetAxis("P1-HorizontalLeft") + "; LV: " + Input.GetAxis("P1-VerticalLeft") + "; RH: " + Input.GetAxis("P1-HorizontalRight") + "; RV: " + Input.GetAxis("P1-VerticalRight");
-            //portText.text += "LH: " + Input.GetAxis("P2-HorizontalLeft") + "; LV: " + Input.GetAxis("P2-VerticalLeft") + "; RH: " + Input.GetAxis("P2-HorizontalRight") + "; RV: " + Input.GetAxis("P2-VerticalRight");
         } 
 
         // check for joystick or keyboard input => store the input  AND test for tutorial advancement
         if (p1Enabled == true) {
-            right = -Input.GetAxis("P1-VerticalLeft");
+            right = Input.GetAxis("P1-VerticalLeft");
             if (Input.GetKey(KeyCode.RightArrow)) right = 1.0f;   // rcc - add keyboard control for testing
-            ///if (right > 0.3 && !rightfirst) {        // advance tutorial?
-                ///rightfirst = true;
-                ///triggerControl.TriggerEvent("Trigger #2-2 - experience begins");
-            ///}
+            if (right > 0.3 && !rightfirst) {        // advance tutorial?
+                rightfirst = true;
+                triggerControl.TriggerEvent("Trigger #2-2 - enable player2 tutorial");
+            }
         }
         if (p2Enabled == true) {
-            left = -Input.GetAxis("P2-VerticalLeft");
+            left = Input.GetAxis("P2-HorizontalRight");
 			if (Input.GetKey(KeyCode.LeftArrow)) left = 1.0f; // rcc - add keyboard control for testing
-            ///if (left > 0.3 && !leftfirst) {        // advance tutorial?
-                ///leftfirst = true;
-                ///triggerControl.TriggerEvent("Trigger #2-3 - experience begins");
-            ///}
+            if (left > 0.3 && !leftfirst) {        // advance tutorial?
+                leftfirst = true;
+                triggerControl.TriggerEvent("Trigger #2-3 - tutorial ends");
+            }
         }
         if (!cannonEnabled)
         {
@@ -189,33 +196,36 @@ public class CameraMovement2 : MonoBehaviour {
             }
         }
 
-        /*if (canRise == true) {
-            rise = Input.GetButton("P1-A"); // rcc - changed to bool since Input returns bool
-            if (Input.GetKey(KeyCode.UpArrow)) rise = true; // rcc - add keyboard control for testing
-            //if (rise && !risefirst) {       // advance tutorial
-                ///risefirst = true;
-                ///triggerControl.TriggerEvent("Trigger #2-4 - experience begins");
-            ///}
+        if (whaleEnabled)
+        {
+            if (!whaleFirst)
+            {
+                whale.SetActive(true);
+                whaleFirst = true;
+            }
+            MoveWhale();
         }
-        if (canFall == true) {
-            fall = Input.GetButton("P2-A"); // rcc - changed to bool since Input returns bool
-            if (Input.GetKey(KeyCode.S)) fall = true; // rcc - add keyboard control for testing
-            ///if (fall && !fallfirst) {        // advance tutorial?
-                ///fallfirst = true;
-                ///triggerControl.TriggerEvent("Trigger #2-5-6 - experience begins");
-            ///}
-        }*/
         
         if (startExperience && !node.GetComponent<CollisionControl>().introStart)
             node.transform.position = Vector3.MoveTowards(node.transform.position, startTarget.transform.position, 6.0f * Time.deltaTime);
         // update the position of the node
         node.transform.Translate(Vector3.forward * forward * Time.deltaTime*6.0f);
         ///node.transform.Translate(Vector3.up * up * Time.deltaTime * 15.0f);     // rcc - add in rise and fall
-        node.transform.Rotate(Vector3.up, roll * Time.deltaTime * 10.0f * rotateSpeedRoll);
-        node.transform.Rotate(Vector3.right, pitch * Time.deltaTime * 10.0f * rotateSpeedPitch);
+        if (p1Enabled && p2Enabled)
+        {
+            node.transform.Rotate(Vector3.up, roll * Time.deltaTime * 10.0f * rotateSpeedRoll);
+            node.transform.Rotate(Vector3.right, pitch * Time.deltaTime * 10.0f * rotateSpeedPitch);
+        }
         // rcc - cap the sub vertical height
         ///if (node.transform.position.y > subHighCutoff) { node.transform.position = new Vector3(node.transform.position.x, subHighCutoff, node.transform.position.z); }
 
+    }
+
+    void MoveWhale()
+    {
+        currentWhaleTarget = whaleTargets[targetCount];
+        whale.transform.position = Vector3.MoveTowards(whale.transform.position, currentWhaleTarget.transform.position, 15.0f * Time.deltaTime);
+        whale.transform.LookAt(currentWhaleTarget.transform);
     }
 
     void Shoot() {
@@ -395,13 +405,13 @@ public class CameraMovement2 : MonoBehaviour {
 
 			break;
 		case "P2-LeftStick":
-                // do something
-                if (!started) starboardText.text += " Left Stick Pressed";
-                break;
+            // do something
+        
+            break;
 		case "P2-RightStick":
-                // do something
-                if (!started) starboardText.text += " Right Stick pressed";
-                break;
+            // do something
+
+            break;
 		
 		}
 	}
