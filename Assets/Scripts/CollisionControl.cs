@@ -24,10 +24,10 @@ public class CollisionControl : MonoBehaviour {
         {
             case "intro trigger":
                 introStart = true;
-                notify.SendMessage("TriggerEvent", "Trigger #2 - experience begins");
+                notify.SendMessage("TriggerEvent", "Trigger #2 - enable player1 tutorial");
                 break;
-            case "after tutorial trigger":
-                notify.SendMessage("TriggerEvent", "Trigger #3 - reach a certain point");
+            case "whale trigger":
+                notify.SendMessage("TriggerEvent", "Trigger #3 - whale interaction");
                 break;
             case "small tremmor trigger":
                 notify.SendMessage("TriggerEvent", "Trigger #4 - minor tremor, small rocks fall");
