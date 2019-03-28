@@ -19,7 +19,6 @@ public class CameraMovement2 : MonoBehaviour {
     public Button starboardButton;
     public Text cannonActivatedText;
     public Text cannonAssignedText;
-    public GameObject whale;
 
     [HideInInspector]
     public bool p1Enabled = false;
@@ -29,14 +28,8 @@ public class CameraMovement2 : MonoBehaviour {
     public bool canRise = false;
     [HideInInspector]
     public bool canFall = false;
-    [HideInInspector]
-    public bool whaleEnabled = false;
-    [HideInInspector]
-    public int targetCount = 0;
-
-    public GameObject[] whaleTargets;
-
-    private bool whaleFirst = false;
+    
+    
     private bool rightfirst = false;
     private bool leftfirst = false;
     private bool risefirst = false;
@@ -70,8 +63,13 @@ public class CameraMovement2 : MonoBehaviour {
 
     private bool cannonFired = false;
     public float fireDelay = 1f;
+    public GameObject flashlight;
+    private bool currentFlashlightState = false;
 
-    private GameObject currentWhaleTarget;
+    [SerializeField]
+    private float radius = 1.0F;
+    [SerializeField]
+    private float power = 10.0F;
 
     // Use this for initialization
     void Start () {
@@ -89,7 +87,7 @@ public class CameraMovement2 : MonoBehaviour {
         // JUST TO GET STARTED
         p1Enabled = true;
         p2Enabled = true;
-        
+        flashlight.SetActive(false);
     }
 
     public void StartButton() {
@@ -101,6 +99,12 @@ public class CameraMovement2 : MonoBehaviour {
             startExperience = true;
         }
         
+    }
+
+    private void ToggleFlashlight(bool state)
+    {
+        currentFlashlightState = !state;
+        flashlight.SetActive(currentFlashlightState);
     }
 
     public void SkipButton()
@@ -145,27 +149,11 @@ public class CameraMovement2 : MonoBehaviour {
             portText.text = "Port Controller - ";
         } 
 
-        // check for joystick or keyboard input => store the input  AND test for tutorial advancement
-        if (p1Enabled == true) {
-            right = Input.GetAxis("P1-VerticalLeft");
-            if (Input.GetKey(KeyCode.RightArrow)) right = 1.0f;   // rcc - add keyboard control for testing
-            if (right > 0.3 && !rightfirst) {        // advance tutorial?
-                rightfirst = true;
-                triggerControl.TriggerEvent("Trigger #2-2 - enable player2 tutorial");
-            }
-        }
-        if (p2Enabled == true) {
-            left = Input.GetAxis("P2-HorizontalRight");
-			if (Input.GetKey(KeyCode.LeftArrow)) left = 1.0f; // rcc - add keyboard control for testing
-            if (left > 0.3 && !leftfirst) {        // advance tutorial?
-                leftfirst = true;
-                triggerControl.TriggerEvent("Trigger #2-3 - tutorial ends");
-            }
-        }
+      
         if (!cannonEnabled)
         {
-            pitch = Input.GetAxis("P1-VerticalLeft");
-            roll = Input.GetAxis("P2-HorizontalRight");
+           // pitch = Input.GetAxis("P1-VerticalLeft");
+           // roll = Input.GetAxis("P2-HorizontalRight");
         }
         if (cannonEnabled)
         {
@@ -196,15 +184,11 @@ public class CameraMovement2 : MonoBehaviour {
             }
         }
 
-        if (whaleEnabled)
+        if (Input.GetButtonDown("P1-A") || Input.GetButtonDown("P2-A"))
         {
-            if (!whaleFirst)
-            {
-                whale.SetActive(true);
-                whaleFirst = true;
-            }
-            MoveWhale();
+            ToggleFlashlight(currentFlashlightState);
         }
+
         
         if (startExperience && !node.GetComponent<CollisionControl>().introStart)
             node.transform.position = Vector3.MoveTowards(node.transform.position, startTarget.transform.position, 6.0f * Time.deltaTime);
@@ -221,12 +205,46 @@ public class CameraMovement2 : MonoBehaviour {
 
     }
 
-    void MoveWhale()
+    public IEnumerator DestroyObject(GameObject current, GameObject shatter)
     {
-        currentWhaleTarget = whaleTargets[targetCount];
-        whale.transform.position = Vector3.MoveTowards(whale.transform.position, currentWhaleTarget.transform.position, 15.0f * Time.deltaTime);
-        whale.transform.LookAt(currentWhaleTarget.transform);
+        shatter.transform.position = current.transform.position;
+       
+        current.SetActive(false);
+        shatter.SetActive(true);
+        //shatter.GetComponent<AudioSource>().Play();
+        Vector3 explosionPos = shatter.transform.position;
+        Collider[] colliders = Physics.OverlapSphere(explosionPos, radius);
+        foreach (Collider hit in colliders)
+        {
+            Rigidbody rb = hit.GetComponent<Rigidbody>();
+
+            if (rb != null && rb.gameObject.tag != "Player")
+            {
+                rb.AddExplosionForce(power, explosionPos, radius, 3.0F);
+                //Debug.Log("Force Added");
+                rb.useGravity = true;
+            }
+        }
+        StartCoroutine(DisableShardPhysics(shatter));
+        yield return null;
     }
+
+    private IEnumerator DisableShardPhysics(GameObject shatter)
+    {
+        yield return new WaitForSeconds(2.5f);
+        foreach (Rigidbody rb in shatter.GetComponentsInChildren<Rigidbody>())
+        {
+            rb.isKinematic = true;
+            rb.detectCollisions = false;
+        }
+        yield return new WaitForSeconds(1f);
+        int shardCount = shatter.transform.childCount;
+        for (int i = 0; i < shardCount; i += 2)
+        {
+            Destroy(shatter.transform.GetChild(i).gameObject);
+        }
+    }
+
 
     void Shoot() {
         cannonFired = true;
@@ -259,13 +277,31 @@ public class CameraMovement2 : MonoBehaviour {
 
     void Position()
     {
-        if (Input.GetKey(KeyCode.Space))
+        if (starboardCannons)
         {
-            forward = moveSpeed;
+            if (Mathf.Abs(Input.GetAxis("P2-LTrigger")) == 1 || Mathf.Abs(Input.GetAxis("P2-RTrigger")) == 1)
+            {
+                Debug.Log("Moving P2");
+                forward = moveSpeed;
+            }
+            else
+            {
+                forward = 0.0f;
+            }
         }
-        else {
-            forward = 0.0f;
+        else if (portCannons)
+        {
+            if (Mathf.Abs(Input.GetAxis("P1-LTrigger")) == 1 || Mathf.Abs(Input.GetAxis("P1-RTrigger")) == 1)
+            {
+                Debug.Log("Moving P1");
+                forward = moveSpeed;
+            }
+            else
+            {
+                forward = 0.0f;
+            }
         }
+
         /*
         // how far off are the sticks from each other
         float dif = left - right;

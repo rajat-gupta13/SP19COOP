@@ -65,7 +65,6 @@ public class TriggerControl : MonoBehaviour {
                 // play audio file #1
                 StartCoroutine(PlayFile(4, 0.01f));
                 // Right Guest is allowed to move throttle (joystick)
-                move.whaleEnabled = true;
                 break;
 
             case "Trigger #12 - credits":
