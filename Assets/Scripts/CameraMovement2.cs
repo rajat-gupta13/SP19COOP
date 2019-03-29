@@ -42,10 +42,10 @@ public class CameraMovement2 : MonoBehaviour {
     private float up = 0.0f;
     private float turn = 0.0f;
     private float forwardThresh = 0.2f;
-    private float upwardSpeed = 0.1f;  // rcc - rate of verticle movement
+    public float upwardSpeed = 0.1f;  // rcc - rate of verticle movement
     private bool started = false;
     private string floorStatus = "down";
-    private float subHighCutoff = 15.0f;
+    public float subHighCutoff = 100.0f;
     public bool cannonEnabled = false;
     private float pitch;
     private float roll;
@@ -166,7 +166,7 @@ public class CameraMovement2 : MonoBehaviour {
             }
             if (starboardCannons)
             {
-                pitch = Input.GetAxis("P2-VerticalLeft");
+                //pitch = Input.GetAxis("P2-VerticalLeft");
                 roll = Input.GetAxis("P2-HorizontalRight");
                 if ((Mathf.Abs(Input.GetAxis("P1-LTrigger")) == 1 || Mathf.Abs(Input.GetAxis("P1-RTrigger")) == 1) && !cannonFired)
                 {
@@ -175,7 +175,7 @@ public class CameraMovement2 : MonoBehaviour {
             }
             else if (portCannons)
             {
-                pitch = Input.GetAxis("P1-VerticalLeft");
+                //pitch = Input.GetAxis("P1-VerticalLeft");
                 roll = Input.GetAxis("P1-HorizontalRight");
                 if ((Mathf.Abs(Input.GetAxis("P2-LTrigger")) == 1 || Mathf.Abs(Input.GetAxis("P2-RTrigger")) == 1) && !cannonFired)
                 {
@@ -194,14 +194,14 @@ public class CameraMovement2 : MonoBehaviour {
             node.transform.position = Vector3.MoveTowards(node.transform.position, startTarget.transform.position, 6.0f * Time.deltaTime);
         // update the position of the node
         node.transform.Translate(Vector3.forward * forward * Time.deltaTime*6.0f);
-        ///node.transform.Translate(Vector3.up * up * Time.deltaTime * 15.0f);     // rcc - add in rise and fall
+        node.transform.Translate(Vector3.up * up * Time.deltaTime * 15.0f);     // rcc - add in rise and fall
         if (p1Enabled && p2Enabled)
         {
             node.transform.Rotate(Vector3.up, roll * Time.deltaTime * 10.0f * rotateSpeedRoll);
-            node.transform.Rotate(Vector3.right, pitch * Time.deltaTime * 10.0f * rotateSpeedPitch);
+            //node.transform.Rotate(Vector3.right, pitch * Time.deltaTime * 10.0f * rotateSpeedPitch);
         }
         // rcc - cap the sub vertical height
-        ///if (node.transform.position.y > subHighCutoff) { node.transform.position = new Vector3(node.transform.position.x, subHighCutoff, node.transform.position.z); }
+        //if (node.transform.position.y > subHighCutoff) { node.transform.position = new Vector3(node.transform.position.x, subHighCutoff, node.transform.position.z); }
 
     }
 
@@ -279,6 +279,7 @@ public class CameraMovement2 : MonoBehaviour {
     {
         if (starboardCannons)
         {
+            up = - Input.GetAxis("P2-VerticalLeft") * upwardSpeed;
             if (Mathf.Abs(Input.GetAxis("P2-LTrigger")) == 1 || Mathf.Abs(Input.GetAxis("P2-RTrigger")) == 1)
             {
                 Debug.Log("Moving P2");
@@ -291,6 +292,7 @@ public class CameraMovement2 : MonoBehaviour {
         }
         else if (portCannons)
         {
+            up = - Input.GetAxis("P1-VerticalLeft") * upwardSpeed;
             if (Mathf.Abs(Input.GetAxis("P1-LTrigger")) == 1 || Mathf.Abs(Input.GetAxis("P1-RTrigger")) == 1)
             {
                 Debug.Log("Moving P1");

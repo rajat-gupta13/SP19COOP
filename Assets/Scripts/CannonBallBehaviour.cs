@@ -6,8 +6,9 @@ public class CannonBallBehaviour : MonoBehaviour {
 
     public float cannonDamage = 10f;
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision other)
     {
+        Debug.Log("Cannon hit: " + other.gameObject.name);
         Target target = other.transform.GetComponent<Target>();
         if (target != null)
         {

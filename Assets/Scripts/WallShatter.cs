@@ -20,7 +20,7 @@ public class WallShatter : MonoBehaviour {
     {
         if ((collision.gameObject.tag == "CannonBall") && !hasCollided)
         {
-            //Debug.Log("Player Collided with " + this.gameObject.name);
+            Debug.Log("Wall Collided with " + this.gameObject.name);
             hasCollided = true;
             //GetComponent<AudioSource>().Play();
             StartCoroutine(mainController.GetComponent<CameraMovement2>().DestroyObject(current, shatter));
