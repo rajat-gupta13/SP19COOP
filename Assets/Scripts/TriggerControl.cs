@@ -77,6 +77,13 @@ public class TriggerControl : MonoBehaviour {
                 move.treasurePicked = true;
                 break;
 
+            case "Trigger #5 - spawn ghost in room":
+                // play audio file #1
+                StartCoroutine(PlayFile(6, 0.01f));
+                // treasure chest picked
+                move.room2Entered = true;
+                break;
+
             case "Trigger #12 - credits":
 			    // show credit screen
 			    creditScreen.SetActive(true);

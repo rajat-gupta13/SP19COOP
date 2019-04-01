@@ -21,7 +21,7 @@ public class CameraMovement2 : MonoBehaviour {
     public int ghostCountRoom1 = 3;
     public int ghostCountRoom2 = 5;
     public GameObject[] ghostSpawnPointsRoom1;
-
+    public GameObject[] ghostSpawnPointsRoom2;
     public GameObject ghostPrefab;
 
     [HideInInspector]
@@ -30,7 +30,10 @@ public class CameraMovement2 : MonoBehaviour {
     public bool p2Enabled = false;
     [HideInInspector]
     public bool treasurePicked = false;
+    [HideInInspector]
+    public bool room2Entered = false;
 
+    private bool room2First = false;
     private bool treasureFirst = false;
     private float forward = 0.0f;
     private float up = 0.0f;
@@ -69,6 +72,8 @@ public class CameraMovement2 : MonoBehaviour {
     public GameObject[] rockPrefabs;
     public int rockCount = 15;
     public GameObject caveInBox;
+    public GameObject treasureChest;
+    
 
     // Use this for initialization
     void Start () {
@@ -195,7 +200,18 @@ public class CameraMovement2 : MonoBehaviour {
             {
                 Debug.Log("Treasure picked");
                 treasureFirst = true;
+                treasureChest.SetActive(false);
                 StartCoroutine(SpawnCaveIn());
+            }
+        }
+
+        if (room2Entered)
+        {
+            if (!room2First)
+            {
+                Debug.Log("Room 2 Entered");
+                room2First = false;
+                StartCoroutine(GhostSpawnRoom2());
             }
         }
         
@@ -279,6 +295,18 @@ public class CameraMovement2 : MonoBehaviour {
     }
 
     private IEnumerator GhostSpawnRoom1()
+    {
+        yield return new WaitForSeconds(1.5f);
+        while (ghostCountRoom1 > 0)
+        {
+            Vector3 spawnPosition = ghostSpawnPointsRoom1[ghostCountRoom1 - 1].transform.position;
+            GameObject ghost = Instantiate(ghostPrefab);
+            ghost.transform.position = spawnPosition;
+            ghostCountRoom1--;
+            yield return new WaitForSeconds(1f);
+        }
+    }
+    private IEnumerator GhostSpawnRoom2()
     {
         yield return new WaitForSeconds(1.5f);
         while (ghostCountRoom1 > 0)

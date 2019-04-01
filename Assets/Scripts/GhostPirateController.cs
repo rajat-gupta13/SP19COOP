@@ -15,18 +15,12 @@ public class GhostPirateController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        Debug.Log(Vector3.Distance(player.transform.position, this.transform.position) );
+        Debug.Log(Vector3.Distance(player.transform.position, this.transform.position) <= minDistance);
         if (Vector3.Distance(player.transform.position, this.transform.position) <= minDistance)
         {
             transform.LookAt(player.transform);
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, (player.transform.position - transform.position), out hit, minDistance))
-            {
-                if (hit.collider.gameObject.tag == "Player")
-                {
-                    transform.Translate(Vector3.forward * ghostMoveSpeed * Time.deltaTime * 6.0f);
-                }
-            }
+            transform.Translate(Vector3.forward * ghostMoveSpeed * Time.deltaTime * 6.0f);
+            
         }
 	}
 }

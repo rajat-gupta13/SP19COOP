@@ -36,8 +36,8 @@ public class CollisionControl : MonoBehaviour {
                 notify.SendMessage("TriggerEvent", "Trigger #4 - minor tremor, small rocks fall");
                 break;
             
-            case "loose the radio trigger":
-                notify.SendMessage("TriggerEvent", "Trigger #6 - starting down the left of y");
+            case "spawn ghost in room":
+                notify.SendMessage("TriggerEvent", "Trigger #5 - spawn ghost in room");
                 break;
             case "Music Change to Keep trigger":
                 notify.SendMessage("TriggerEvent", "Trigger #7 - enter the underwater valley");
