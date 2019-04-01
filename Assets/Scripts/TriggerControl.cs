@@ -9,6 +9,7 @@ public class TriggerControl : MonoBehaviour {
 	public CameraMovement2 move;
 	public GameObject titleScreen;
 	public GameObject creditScreen;
+    public GameObject getInsideTrigger;
 
 	private int index;
 
@@ -45,8 +46,10 @@ public class TriggerControl : MonoBehaviour {
 		    case "Trigger #2 - enable player1 tutorial":
 			    // play audio file #1
 			    StartCoroutine(PlayFile(1, 0.01f));
-			    // Right Guest is allowed to move throttle (joystick)
+                // Right Guest is allowed to move throttle (joystick)
+                move.subHighCutoff = 300.0f;
 			    move.p1Enabled = true;
+                getInsideTrigger.SetActive(true);
 			    break;
 
             case "Trigger #2-2 - enable player2 tutorial":
@@ -61,10 +64,17 @@ public class TriggerControl : MonoBehaviour {
                 StartCoroutine(PlayFile(3, 0.01f));               
                 break;
 
-            case "Trigger #3 - whale interaction":
+            case "Trigger #3 - not getting in keep":
                 // play audio file #1
                 StartCoroutine(PlayFile(4, 0.01f));
                 // Right Guest is allowed to move throttle (joystick)
+                break;
+
+            case "Trigger #4 - treasure chest picked":
+                // play audio file #1
+                StartCoroutine(PlayFile(5, 0.01f));
+                // treasure chest picked
+                move.treasurePicked = true;
                 break;
 
             case "Trigger #12 - credits":

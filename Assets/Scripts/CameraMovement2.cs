@@ -13,31 +13,25 @@ public class CameraMovement2 : MonoBehaviour {
     public GameObject node;         // camera rig node
     public TriggerControl triggerControl;
     public float moveSpeed = 2f;
-    public float rotateSpeedPitch = 2f;
     public float rotateSpeedRoll = 2f;
     public Button portButton;
     public Button starboardButton;
     public Text cannonActivatedText;
     public Text cannonAssignedText;
+    public int ghostCountRoom1 = 3;
+    public int ghostCountRoom2 = 5;
+    public GameObject[] ghostSpawnPointsRoom1;
+
+    public GameObject ghostPrefab;
 
     [HideInInspector]
     public bool p1Enabled = false;
     [HideInInspector]
     public bool p2Enabled = false;
     [HideInInspector]
-    public bool canRise = false;
-    [HideInInspector]
-    public bool canFall = false;
-    
-    
-    private bool rightfirst = false;
-    private bool leftfirst = false;
-    private bool risefirst = false;
-    private bool fallfirst = false;
-    private float left;
-    private float right;
-    private bool rise = false;   // rcc - changed from float  to bool
-    private bool fall = false;   // rcc - changed from float to bool
+    public bool treasurePicked = false;
+
+    private bool treasureFirst = false;
     private float forward = 0.0f;
     private float up = 0.0f;
     private float turn = 0.0f;
@@ -70,6 +64,11 @@ public class CameraMovement2 : MonoBehaviour {
     private float radius = 1.0F;
     [SerializeField]
     private float power = 10.0F;
+    public float waitForCaveInTime = 2.5f;
+    public GameObject caveInSpawn;
+    public GameObject[] rockPrefabs;
+    public int rockCount = 15;
+    public GameObject caveInBox;
 
     // Use this for initialization
     void Start () {
@@ -142,19 +141,22 @@ public class CameraMovement2 : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+            #else
+                Application.Quit();
+            #endif
+        }
+
         // help the facilatator tell what joystick is which
         if (!started) {
             starboardText.text = "Starboard Controller - ";
             portText.text = "Port Controller - ";
         } 
 
-      
-        if (!cannonEnabled)
-        {
-           // pitch = Input.GetAxis("P1-VerticalLeft");
-           // roll = Input.GetAxis("P2-HorizontalRight");
-        }
         if (cannonEnabled)
         {
             if (!cannonEnableFirst)
@@ -166,7 +168,6 @@ public class CameraMovement2 : MonoBehaviour {
             }
             if (starboardCannons)
             {
-                //pitch = Input.GetAxis("P2-VerticalLeft");
                 roll = Input.GetAxis("P2-HorizontalRight");
                 if ((Mathf.Abs(Input.GetAxis("P1-LTrigger")) == 1 || Mathf.Abs(Input.GetAxis("P1-RTrigger")) == 1) && !cannonFired)
                 {
@@ -175,7 +176,6 @@ public class CameraMovement2 : MonoBehaviour {
             }
             else if (portCannons)
             {
-                //pitch = Input.GetAxis("P1-VerticalLeft");
                 roll = Input.GetAxis("P1-HorizontalRight");
                 if ((Mathf.Abs(Input.GetAxis("P2-LTrigger")) == 1 || Mathf.Abs(Input.GetAxis("P2-RTrigger")) == 1) && !cannonFired)
                 {
@@ -189,20 +189,49 @@ public class CameraMovement2 : MonoBehaviour {
             ToggleFlashlight(currentFlashlightState);
         }
 
+        if (treasurePicked)
+        {
+            if (!treasureFirst)
+            {
+                Debug.Log("Treasure picked");
+                treasureFirst = true;
+                StartCoroutine(SpawnCaveIn());
+            }
+        }
         
         if (startExperience && !node.GetComponent<CollisionControl>().introStart)
-            node.transform.position = Vector3.MoveTowards(node.transform.position, startTarget.transform.position, 6.0f * Time.deltaTime);
+            node.transform.position = Vector3.MoveTowards(node.transform.position, startTarget.transform.position, 25.0f * Time.deltaTime);
         // update the position of the node
         node.transform.Translate(Vector3.forward * forward * Time.deltaTime*6.0f);
         node.transform.Translate(Vector3.up * up * Time.deltaTime * 15.0f);     // rcc - add in rise and fall
         if (p1Enabled && p2Enabled)
         {
-            node.transform.Rotate(Vector3.up, roll * Time.deltaTime * 10.0f * rotateSpeedRoll);
-            //node.transform.Rotate(Vector3.right, pitch * Time.deltaTime * 10.0f * rotateSpeedPitch);
+            //node.transform.Rotate(Vector3.up, roll * Time.deltaTime * 10.0f * rotateSpeedRoll);
+            node.transform.Rotate(Vector3.up, roll * Time.deltaTime * 10.0f * rotateSpeedRoll, Space.Self);
         }
         // rcc - cap the sub vertical height
-        //if (node.transform.position.y > subHighCutoff) { node.transform.position = new Vector3(node.transform.position.x, subHighCutoff, node.transform.position.z); }
+        if (node.transform.localPosition.y > subHighCutoff) { node.transform.position = new Vector3(node.transform.position.x, subHighCutoff, node.transform.position.z); }
 
+    }
+
+    private IEnumerator SpawnCaveIn()
+    {
+        yield return new WaitForSeconds(0.5f);
+        //floor.moveAll(5.0f);
+        floorStatus = "half-up";
+        yield return new WaitForSeconds(waitForCaveInTime);
+        while (rockCount > 0)
+        {
+            Vector3 spawnPosition = new Vector3(caveInSpawn.transform.position.x + UnityEngine.Random.Range(-15f, 15f), caveInSpawn.transform.position.y, caveInSpawn.transform.position.z);
+            GameObject rock =  Instantiate(rockPrefabs[UnityEngine.Random.Range(0, rockPrefabs.Length)]);
+            rock.transform.position = spawnPosition;
+            rockCount--;
+            yield return new WaitForSeconds(0.15f);
+        }
+        //floor.lowerFloor();
+        floorStatus = "down";
+        caveInBox.SetActive(true);
+        StartCoroutine(GhostSpawnRoom1());
     }
 
     public IEnumerator DestroyObject(GameObject current, GameObject shatter)
@@ -231,17 +260,34 @@ public class CameraMovement2 : MonoBehaviour {
 
     private IEnumerator DisableShardPhysics(GameObject shatter)
     {
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(1f);
         foreach (Rigidbody rb in shatter.GetComponentsInChildren<Rigidbody>())
         {
             rb.isKinematic = true;
             rb.detectCollisions = false;
+        }
+        foreach (MeshCollider col in shatter.GetComponentsInChildren<MeshCollider>())
+        {
+            col.isTrigger = true;
         }
         yield return new WaitForSeconds(1f);
         int shardCount = shatter.transform.childCount;
         for (int i = 0; i < shardCount; i += 2)
         {
             Destroy(shatter.transform.GetChild(i).gameObject);
+        }
+    }
+
+    private IEnumerator GhostSpawnRoom1()
+    {
+        yield return new WaitForSeconds(1.5f);
+        while (ghostCountRoom1 > 0)
+        {
+            Vector3 spawnPosition = ghostSpawnPointsRoom1[ghostCountRoom1 - 1].transform.position;
+            GameObject ghost = Instantiate(ghostPrefab);
+            ghost.transform.position = spawnPosition;
+            ghostCountRoom1--;
+            yield return new WaitForSeconds(1f);
         }
     }
 
@@ -355,8 +401,6 @@ public class CameraMovement2 : MonoBehaviour {
         // called by TrackWaypoints to stop the player after teleport
         p1Enabled = false;
         p2Enabled = false;
-        right = 0;
-        left = 0;
         floor.moveAll(0.0f);
     }
 

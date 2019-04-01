@@ -26,15 +26,16 @@ public class CollisionControl : MonoBehaviour {
                 introStart = true;
                 notify.SendMessage("TriggerEvent", "Trigger #2 - enable player1 tutorial");
                 break;
-            case "whale trigger":
-                notify.SendMessage("TriggerEvent", "Trigger #3 - whale interaction");
+            case "get inside trigger":
+                notify.SendMessage("TriggerEvent", "Trigger #3 - not getting in keep");
+                break;
+            case "treasure chest":
+                notify.SendMessage("TriggerEvent", "Trigger #4 - treasure chest picked");
                 break;
             case "small tremmor trigger":
                 notify.SendMessage("TriggerEvent", "Trigger #4 - minor tremor, small rocks fall");
                 break;
-            case "get to y trigger":
-                notify.SendMessage("TriggerEvent", "Trigger #5 - get to the y");
-                break;
+            
             case "loose the radio trigger":
                 notify.SendMessage("TriggerEvent", "Trigger #6 - starting down the left of y");
                 break;
