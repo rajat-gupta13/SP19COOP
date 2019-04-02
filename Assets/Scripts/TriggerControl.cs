@@ -46,7 +46,7 @@ public class TriggerControl : MonoBehaviour {
 
 		    case "Trigger #2 - enable tutorial":
 			    // play audio file #1
-			    StartCoroutine(PlayFile(1, 0.01f));
+			    StartCoroutine(PlayFile(2, 0.01f));
                 // Right Guest is allowed to move throttle (joystick)
                 move.subHighCutoff = 300.0f;
 			    //move.p1Enabled = true;
@@ -59,7 +59,7 @@ public class TriggerControl : MonoBehaviour {
                 StartCoroutine(PlayFile(3, 0.01f));
                 // Left Guest is allowed to move throttle (joystick)
                 //move.p2Enabled = true;
-                StartCoroutine(WaitingToTrigger("Trigger #2-3 - tutorial ends", clips[3].length + 0.01f));
+                //StartCoroutine(WaitingToTrigger("Trigger #2-3 - tutorial ends", clips[3].length + 0.01f));
                 break;
 
             case "Trigger #2-3 - tutorial ends":
@@ -149,7 +149,7 @@ public class TriggerControl : MonoBehaviour {
                 StartCoroutine(PlayFile(18, 0.01f));
                 StartCoroutine(WaitingToTrigger("Trigger #15 - credits", clips[18].length + 0.01f));
                 // treasure chest picked
-                //move.room2Entered = true;
+                move.endExperience = true;
                 break;
 
             case "Trigger #15 - credits":

@@ -7,9 +7,10 @@ public class WallShatter : MonoBehaviour {
     private bool hasCollided = false;
     public GameObject current, shatter;
     public GameObject mainController;
+    
     // Use this for initialization
     void Start () {
-		
+       
 	}
 	
 	// Update is called once per frame

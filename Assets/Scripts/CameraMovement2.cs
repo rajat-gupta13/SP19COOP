@@ -33,6 +33,9 @@ public class CameraMovement2 : MonoBehaviour {
     [HideInInspector]
     public bool room2Entered = false;
 
+    [HideInInspector]
+    public bool endExperience = false;
+
     private bool room2First = false;
     private bool treasureFirst = false;
     private float forward = 0.0f;
@@ -73,7 +76,9 @@ public class CameraMovement2 : MonoBehaviour {
     public int rockCount = 15;
     public GameObject caveInBox;
     public GameObject treasureChest;
-    
+    public GameObject corridorEntry1Effects;
+    private bool endExperienceFirst = false;
+    public GameObject endTarget;
 
     // Use this for initialization
     void Start () {
@@ -92,6 +97,7 @@ public class CameraMovement2 : MonoBehaviour {
         p1Enabled = true;
         p2Enabled = true;
         flashlight.SetActive(false);
+        corridorEntry1Effects.SetActive(false);
     }
 
     public void StartButton() {
@@ -175,15 +181,13 @@ public class CameraMovement2 : MonoBehaviour {
             }
             if (starboardCannons)
             {
-                roll = Input.GetAxis("P2-HorizontalRight");
                 if ((Mathf.Abs(Input.GetAxis("P1-LTrigger")) == 1 || Mathf.Abs(Input.GetAxis("P1-RTrigger")) == 1) && !cannonFired)
                 {
                     Shoot();
                 }
             }
             else if (portCannons)
-            {
-                roll = Input.GetAxis("P1-HorizontalRight");
+            {   
                 if ((Mathf.Abs(Input.GetAxis("P2-LTrigger")) == 1 || Mathf.Abs(Input.GetAxis("P2-RTrigger")) == 1) && !cannonFired)
                 {
                     Shoot();
@@ -214,6 +218,15 @@ public class CameraMovement2 : MonoBehaviour {
                 Debug.Log("Room 2 Entered");
                 room2First = false;
                 StartCoroutine(GhostSpawnRoom2());
+            }
+        }
+
+        if (endExperience)
+        {
+            if (!endExperienceFirst)
+            {
+                endExperienceFirst = true;
+                StartCoroutine(EndExperience());
             }
         }
         
@@ -249,7 +262,17 @@ public class CameraMovement2 : MonoBehaviour {
         //floor.lowerFloor();
         floorStatus = "down";
         caveInBox.SetActive(true);
+        corridorEntry1Effects.SetActive(true);
         StartCoroutine(GhostSpawnRoom1());
+    }
+
+    private IEnumerator EndExperience()
+    {
+        yield return new WaitForSeconds(2.5f);
+        while (p1Enabled && p2Enabled)
+        {
+            node.transform.position = Vector3.MoveTowards(node.transform.position, endTarget.transform.position, 25.0f * Time.deltaTime);
+        }
     }
 
     public IEnumerator DestroyObject(GameObject current, GameObject shatter)
@@ -278,7 +301,7 @@ public class CameraMovement2 : MonoBehaviour {
 
     private IEnumerator DisableShardPhysics(GameObject shatter)
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
         foreach (Rigidbody rb in shatter.GetComponentsInChildren<Rigidbody>())
         {
             rb.isKinematic = true;
@@ -355,6 +378,7 @@ public class CameraMovement2 : MonoBehaviour {
     {
         if (starboardCannons)
         {
+            roll = Input.GetAxis("P1-HorizontalRight");
             up = - Input.GetAxis("P2-VerticalLeft") * upwardSpeed;
             if (Mathf.Abs(Input.GetAxis("P2-LTrigger")) == 1 || Mathf.Abs(Input.GetAxis("P2-RTrigger")) == 1)
             {
@@ -368,6 +392,7 @@ public class CameraMovement2 : MonoBehaviour {
         }
         else if (portCannons)
         {
+            roll = Input.GetAxis("P2-HorizontalRight");
             up = - Input.GetAxis("P1-VerticalLeft") * upwardSpeed;
             if (Mathf.Abs(Input.GetAxis("P1-LTrigger")) == 1 || Mathf.Abs(Input.GetAxis("P1-RTrigger")) == 1)
             {
