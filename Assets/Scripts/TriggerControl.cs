@@ -10,6 +10,7 @@ public class TriggerControl : MonoBehaviour {
 	public GameObject titleScreen;
 	public GameObject creditScreen;
     public GameObject getInsideTrigger;
+    public GameObject room2Trigger;
 
 	private int index;
 
@@ -43,48 +44,115 @@ public class TriggerControl : MonoBehaviour {
 			    //StartCoroutine(WaitingToTrigger("Trigger #2 - experience begins", clips[1].length + 0.01f));
 			    break;
 
-		    case "Trigger #2 - enable player1 tutorial":
+		    case "Trigger #2 - enable tutorial":
 			    // play audio file #1
 			    StartCoroutine(PlayFile(1, 0.01f));
                 // Right Guest is allowed to move throttle (joystick)
                 move.subHighCutoff = 300.0f;
-			    move.p1Enabled = true;
+			    //move.p1Enabled = true;
                 getInsideTrigger.SetActive(true);
-			    break;
+                StartCoroutine(WaitingToTrigger("Trigger #2-2 - give it a try", clips[1].length + 0.01f));
+                break;
 
-            case "Trigger #2-2 - enable player2 tutorial":
+            case "Trigger #2-2 - give it a try":
                 // play audio file #1
-                StartCoroutine(PlayFile(2, 0.01f));
+                StartCoroutine(PlayFile(3, 0.01f));
                 // Left Guest is allowed to move throttle (joystick)
-                move.p2Enabled = true;
+                //move.p2Enabled = true;
+                StartCoroutine(WaitingToTrigger("Trigger #2-3 - tutorial ends", clips[3].length + 0.01f));
                 break;
 
             case "Trigger #2-3 - tutorial ends":
                 // play audio file #1
-                StartCoroutine(PlayFile(3, 0.01f));               
+                StartCoroutine(PlayFile(5, 0.01f));               
                 break;
 
             case "Trigger #3 - not getting in keep":
                 // play audio file #1
-                StartCoroutine(PlayFile(4, 0.01f));
+                if (UnityEngine.Random.Range(0,1) > 0.5)
+                    StartCoroutine(PlayFile(21, 0.01f));
+                else
+                    StartCoroutine(PlayFile(25, 0.01f));
                 // Right Guest is allowed to move throttle (joystick)
                 break;
 
-            case "Trigger #4 - treasure chest picked":
+            case "Trigger #4 - shoot at wall":
                 // play audio file #1
-                StartCoroutine(PlayFile(5, 0.01f));
+                StartCoroutine(PlayFile(7, 0.01f));
+                // treasure chest picked
+                //move.treasurePicked = true;
+                break;
+
+            case "Trigger #5 - break first wall":
+                // play audio file #1
+                StartCoroutine(PlayFile(8, 0.01f));
+                // treasure chest picked
+                break;
+
+            case "Trigger #6 - enter keep":
+                // play audio file #1
+                StartCoroutine(PlayFile(10, 0.01f));
+                StartCoroutine(WaitingToTrigger("Trigger #7 - locate treasure", clips[10].length + 0.01f));
+                break;
+
+            case "Trigger #7 - locate treasure":
+                // play audio file #1
+                StartCoroutine(PlayFile(12, 0.01f));
+                // treasure chest picked
+                break;
+
+            case "Trigger #8 - treasure chest picked":
+                // play audio file #1
+                StartCoroutine(PlayFile(11, 0.01f));
+                StartCoroutine(WaitingToTrigger("Trigger #9 - cave in start", clips[11].length + 0.01f));
                 // treasure chest picked
                 move.treasurePicked = true;
                 break;
 
-            case "Trigger #5 - spawn ghost in room":
+            case "Trigger #9 - cave in start":
                 // play audio file #1
-                StartCoroutine(PlayFile(6, 0.01f));
+                StartCoroutine(PlayFile(13, 0.01f));
+                StartCoroutine(WaitingToTrigger("Trigger #10 - cave in happening", clips[13].length + 0.01f));
                 // treasure chest picked
+                break;
+
+            case "Trigger #10 - cave in happening":
+                // play audio file #1
+                StartCoroutine(PlayFile(15, 0.01f));
+                StartCoroutine(WaitingToTrigger("Trigger #11 - ghost pirates appear", clips[15].length + 0.01f));
+                // treasure chest picked
+                break;
+
+            case "Trigger #11 - ghost pirates appear":
+                // play audio file #1
+                StartCoroutine(PlayFile(14, 0.01f));
+                StartCoroutine(WaitingToTrigger("Trigger #12 - get back here", clips[14].length + 0.01f));
+                // treasure chest picked
+                break;
+
+            case "Trigger #12 - get back here":
+                // play audio file #1
+                StartCoroutine(PlayFile(16, 0.01f));
+                // treasure chest picked
+                break;
+
+            case "Trigger #13 - spawn ghost in room":
+                // play audio file #1
+                StartCoroutine(PlayFile(17, 0.01f));
+                // treasure chest picked
+                room2Trigger.SetActive(false);
                 move.room2Entered = true;
                 break;
 
-            case "Trigger #12 - credits":
+            case "Trigger #14 - exit keep":
+                // play audio file #1
+                StartCoroutine(PlayFile(18, 0.01f));
+                StartCoroutine(WaitingToTrigger("Trigger #15 - credits", clips[18].length + 0.01f));
+                // treasure chest picked
+                //move.room2Entered = true;
+                break;
+
+            case "Trigger #15 - credits":
 			    // show credit screen
 			    creditScreen.SetActive(true);
 			    // stop guests from moving

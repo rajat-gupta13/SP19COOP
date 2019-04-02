@@ -131,6 +131,7 @@ public class CameraMovement2 : MonoBehaviour {
         starboardButton.interactable = false;
         portButton.interactable = false;
         cannonAssignedText.text += " Starboard";
+        triggerControl.TriggerEvent("Trigger #2 - enable tutorial");
     }
 
     public void PortButton()
@@ -142,6 +143,7 @@ public class CameraMovement2 : MonoBehaviour {
         starboardButton.interactable = false;
         portButton.interactable = false;
         cannonAssignedText.text += " Port";
+        triggerControl.TriggerEvent("Trigger #2 - enable tutorial");
     }
 
     // Update is called once per frame
@@ -309,12 +311,12 @@ public class CameraMovement2 : MonoBehaviour {
     private IEnumerator GhostSpawnRoom2()
     {
         yield return new WaitForSeconds(1.5f);
-        while (ghostCountRoom1 > 0)
+        while (ghostCountRoom2 > 0)
         {
-            Vector3 spawnPosition = ghostSpawnPointsRoom1[ghostCountRoom1 - 1].transform.position;
+            Vector3 spawnPosition = ghostSpawnPointsRoom2[ghostCountRoom2 - 1].transform.position;
             GameObject ghost = Instantiate(ghostPrefab);
             ghost.transform.position = spawnPosition;
-            ghostCountRoom1--;
+            ghostCountRoom2--;
             yield return new WaitForSeconds(1f);
         }
     }

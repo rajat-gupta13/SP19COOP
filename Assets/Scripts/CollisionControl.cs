@@ -24,20 +24,30 @@ public class CollisionControl : MonoBehaviour {
         {
             case "intro trigger":
                 introStart = true;
-                notify.SendMessage("TriggerEvent", "Trigger #2 - enable player1 tutorial");
+                //notify.SendMessage("TriggerEvent", "Trigger #2 - enable player1 tutorial");
                 break;
             case "get inside trigger":
                 notify.SendMessage("TriggerEvent", "Trigger #3 - not getting in keep");
                 break;
             case "treasure chest":
-                notify.SendMessage("TriggerEvent", "Trigger #4 - treasure chest picked");
+                notify.SendMessage("TriggerEvent", "Trigger #8 - treasure chest picked");
                 break;
-            case "small tremmor trigger":
-                notify.SendMessage("TriggerEvent", "Trigger #4 - minor tremor, small rocks fall");
+            case "weird wall trigger":
+               
+                    notify.SendMessage("TriggerEvent", "Trigger #4 - shoot at wall");
                 break;
-            
+            case "enter keep trigger":
+                if (notify.GetComponent<CameraMovement2>().treasurePicked)
+                {
+                    notify.SendMessage("TriggerEvent", "Trigger #14 - exit keep");
+                }
+                else
+                {
+                    notify.SendMessage("TriggerEvent", "Trigger #6 - enter keep");
+                }
+                break;
             case "spawn ghost in room":
-                notify.SendMessage("TriggerEvent", "Trigger #5 - spawn ghost in room");
+                notify.SendMessage("TriggerEvent", "Trigger #13 - spawn ghost in room");
                 break;
             case "Music Change to Keep trigger":
                 notify.SendMessage("TriggerEvent", "Trigger #7 - enter the underwater valley");

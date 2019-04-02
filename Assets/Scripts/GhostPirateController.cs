@@ -11,6 +11,8 @@ public class GhostPirateController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         player = GameObject.Find("Camera Rig");
+        Animation anim = GetComponent<Animation>();
+        anim["PirateFloating"].speed = 0.5f;
 	}
 	
 	// Update is called once per frame
