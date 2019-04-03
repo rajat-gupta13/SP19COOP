@@ -215,6 +215,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cannonDamage: 10
+  shootSFX: {fileID: 8300000, guid: af301021c7bbdbc4fab0842e8ed43bd5, type: 3}
+  impactSFX: {fileID: 8300000, guid: b670c4c09ca2729419ea8378f15d6a82, type: 3}
 --- !u!135 &135809767943357716
 SphereCollider:
   m_ObjectHideFlags: 1
